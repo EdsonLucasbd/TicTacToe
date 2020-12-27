@@ -1,7 +1,5 @@
 import React from 'react';
-import { View, Image, StyleSheet } from 'react-native';
-
-
+import { View, StyleSheet } from 'react-native';
 
 export default function Circle () {
   return (
@@ -25,13 +23,13 @@ const styles = StyleSheet.create ({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#000',
+    backgroundColor: '#fff',
   },
 
   innerCircle: {
     backgroundColor: '#F4E3D4',
-    width: 70,
-    height: 70,
+    width: 60,
+    height: 60,
     borderRadius: 35,
   }
 });

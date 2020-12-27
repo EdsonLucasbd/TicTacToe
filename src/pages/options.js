@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+/* import React, { useRef } from 'react';
 import { View, Image, StyleSheet, TextInput, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native'
 
@@ -101,4 +101,4 @@ const styles = StyleSheet.create ({
 
     color: '#FFFFFF',
   }
-});
+}); */

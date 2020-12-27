@@ -13,14 +13,14 @@ export default function Cross () {
         transform: [
           { rotate: '135deg' },
         ],
-        backgroundColor: '#000'
+        backgroundColor: '#3d3d3d'
       }]}>
       </View>
       <View style={[styles.line, {
         transform: [
           { rotate: '45deg' },
         ],
-        backgroundColor: '#000'
+        backgroundColor: '#3d3d3d'
       }]}>
       </View>
     </View>
