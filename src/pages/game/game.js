@@ -30,10 +30,12 @@ export function playerO(){
     </TouchableOpacity>
   );
 }
+
 export default function game() {
   const [AtualPlayer, setAtualPlayer] = useState();
   const [remainingMoves, setRemainingMoves] = useState(0);
   const [board, setBoard] = useState([]);
+  const [winner, setWinner] = useState('');
 
   
   
@@ -53,7 +55,7 @@ export default function game() {
     [2,5,8],
     [0,4,8],
     [2,4,6]
-],
+];
 
 function check_winning_sequences(player) {
 
@@ -64,10 +66,21 @@ for ( let i in winning_sequences ) {
     console.log('Sequencia vencedora INDEX:' + i);
     return i;
   }
+  //Finalizr com nenhum ganhador
+  if (remainingMoves - 1 === 0) {
+    return endGame('');
+  //Jogo não finalizado
+  } else {
+    setRemainingMoves((remainingMoves - 1));
+  }
 };
 return -1;
 }
   
+function endGame(player) {
+  setWinner(player);
+}
+
   return (
     <View style={styles.container}>
       {
