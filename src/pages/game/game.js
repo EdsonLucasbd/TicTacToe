@@ -1,273 +1,143 @@
 import React, {useState} from 'react';
-import { View, StyleSheet, SafeAreaView, TouchableWithoutFeedback, PanResponder } from 'react-native';
-import Circle from '../../components/circle';
-import Cross from '../../components/cross';
-import {
-  CENTER_POINTS,
-  AREAS,
-  CONDITIONS,
-  GAME_RESULT_NO,
-  GAME_RESULT_USER1,
-  GAME_RESULT_USER2,
-  GAME_RESULT_TIE
-} from '../../constants/gameConstants';
+import { View, StyleSheet, TouchableOpacity, Dimensions, Text } from 'react-native';
 
-/* interface State {
-  firstUserInputs: number[],
-  secondUserInputs: number[],
-  result: number,
-  round: number
-}; */
+export function start(player){
+  const [AtualPlayer, setAtualPlayer] = useState();
+  const [remainingMoves, setRemainingMoves] = useState(0);
+  const [board, setBoard] = useState([]);
 
+  setAtualPlayer(player);
+  setRemainingMoves(9);
+  setBoard([
+    ['','',''],
+    ['','',''],
+    ['','','']
+  ]);
+}
 
+export function playerX(){
+  return(
+    <TouchableOpacity style={styles.boxPlayer}>
+      <Text style={styles.playerX}>X</Text>
+    </TouchableOpacity>
+  );
+}
 
+export function playerO(){
+  return(
+    <TouchableOpacity style={styles.boxPlayer}>
+      <Text style={styles.playerO}>O</Text>
+    </TouchableOpacity>
+  );
+}
 export default function game() {
-  const [ next, setNext ] = useState({});
-  const [ results, setResult ] = useState({});
-  const [ stage, setStage ] = useState({})
+  const [AtualPlayer, setAtualPlayer] = useState();
+  const [remainingMoves, setRemainingMoves] = useState(0);
+  const [board, setBoard] = useState([]);
+
   
-  const state = {
-    firstUserInputs: [],
-    secondUserInputs: [],
-    result: GAME_RESULT_NO,
-    round: 0,
-  };
   
-  function restart() {
-    const { round } = state;
-    setStage({
-      firstUserInputs: [],
-      secondUserInputs: [],
-      result: GAME_RESULT_NO,
-      round: round + 1
-    });
-    setTimeout(() => {
-      if (round % 2 === 0) {
-        SecondUserAction()
-      }
-    }, 5)
+  function makePlay(row, column){
+    board[row][column] = AtualPlayer;
+    setBoard([...board]);
+
+    setAtualPlayer(atualPlayer === 'X' ? 'O' : 'X')
   }
 
-  function boardClickHandler({e}) {
-    const { locationX, locationY } = e.nativeEvent.value;
+  const winning_sequences = [
+    [0,1,2],
+    [3,4,5],
+    [6,7,8],
+    [0,3,6],
+    [1,4,7],
+    [2,5,8],
+    [0,4,8],
+    [2,4,6]
+],
 
-    //const [ locationX, setLocationX ] = useState('0');
-    //const [ locationY, setLocationY ] = useState('0');
-    
+function check_winning_sequences(player) {
 
-    const { firstUserInputs, secondUserInputs, result } = state;
-    if (result !== -1) {
-      return;
-    }
-    const inputs = firstUserInputs.concat(secondUserInputs);
-
-    const area = AREAS.find(d =>
-      (locationX >= d.startX && locationX <= d.endX) &&
-      (locationY >= d.startY && locationY <= d.endY));
-
-      if (area && inputs.every(d => d !== area.id)) {
-        setNext({ firstUserInputs: firstUserInputs.concat(area.id) });
-        setTimeout(() => {
-          judgeWinner();
-          SecondUserAction(e);
-        }, 5);
-      }
+for ( let i in winning_sequences ) {
+  if (board[ winning_sequences[i][0] ] == player  &&
+    board[ winning_sequences[i][1] ] == player &&
+    board[ winning_sequences[i][2] ] == player) {
+    console.log('Sequencia vencedora INDEX:' + i);
+    return i;
   }
-
-  function SecondUserAction({e}) {
-    const { locationX, locationY } = e.nativeEvent;
-
-    const { firstUserInputs, secondUserInputs, result } = state;
-    if (result !== -1) {
-      return;
-    }
-    const inputs = firstUserInputs.concat(secondUserInputs);
-
-    const area = AREAS.find(d =>
-      (locationX >= d.startX && locationX <= d.endX) &&
-      (locationY >= d.startY && locationY <= d.endY));
-
-      if (area && inputs.every(d => d !== area.id)) {
-        setNext({ firstUserInputs: firstUserInputs.concat(area.id) });
-        setTimeout(() => {
-          judgeWinner();
-          boardClickHandler(e);
-        }, 5);
-      }
-  }
-
-  function isWinner(inputs) {
-    return CONDITIONS.some(d => d.every(item => inputs.indexOf(item) !== -1));
-  }
-
-  function judgeWinner() {
-    const { firstUserInputs, secontUserInputs, result } = state;
-    const inputs = firstUserInputs.concat(secontUserInputs);
-
-    if (inputs.length >= 5 ) {
-      let res = isWinner(firstUserInputs);
-      if (res && result !== GAME_RESULT_USER1) {
-        return setResult({ result: GAME_RESULT_USER1 });
-      }
-      res = isWinner(secontUserInputs)
-      if (res && result !== GAME_RESULT_USER2) {
-        return setResult({ result: GAME_RESULT_USER2 });
-      }
-    }
-
-    if (inputs.length === 9 &&
-        result === GAME_RESULT_NO && result !== GAME_RESULT_TIE) {
-          setResult({ result: GAME_RESULT_TIE });
-    }
-  }
-
+};
+return -1;
+}
+  
   return (
     <View style={styles.container}>
-      <TouchableWithoutFeedback onPress={(e) => boardClickHandler(e)}>
-        <SafeAreaView style={styles.board}>
-          <View 
-            style={styles.line} />
-          <View
-            style={[styles.line, {
-              transform: [
-                { translateX: 200 }
-              ]
-            }]}/>
-
-          <View
-            style={[styles.line, {
-              height: 3,
-              width: 306,
-              transform: [
-                { translateY: 200 }
-              ]
-            }]}/>
-
-          <View
-            style={[styles.line, {
-              height: 3,
-              width: 306,
-              transform: [
-                { translateY: 100 }
-              ]
-            }]}/>
-            {
-              state.firstUserInputs.map((current , index) => (
-                <Circle 
-                  key={index}
-                  xTranslate={CENTER_POINTS[current].x}
-                  yTranslate={CENTER_POINTS[current].y}
-                />
-              ))
-            }
-
-            {
-              state.secondUserInputs.map((current , index) => (
-                <Cross 
-                  key={index}
-                  xTranslate={CENTER_POINTS[current].x}
-                  yTranslate={CENTER_POINTS[current].y}
-                />
-              ))
-            }
-        </SafeAreaView>
-      </TouchableWithoutFeedback>
+      {
+        start(playerX),
+        board.map((row, rowNumber) => {
+          return (
+            <View key={rowNumber} style={styles.inlineItems}>
+              {
+                row.map((column, columnNumber) => {
+                  return (
+                    <TouchableOpacity 
+                      key={columnNumber} 
+                      style={styles.boxPlayer}
+                      onPress={() => makePlay(rowNumber, columnNumber)}
+                      disabled={column !== ''}>
+                      <Text style={column === 'X' ? styles.playerX : styles.playerO}>{column}</Text>
+                    </TouchableOpacity>
+                  );
+                })
+              }
+            </View>
+          );
+        })
+      }
     </View>
   );
 }
 
 const styles = StyleSheet.create ({
   container: {
-    display: 'flex',
-    height: '100%',
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'center',
     alignItems: 'center',
+    alignContent: 'center',
     backgroundColor: '#F4E3D4',
   }, 
 
-  board: {
-    borderWidth: 3,
-    borderColor: '#3A3A3C',
-    height: 312,
-    width: 312,
+  positionOnBoard: {
+    width: Dimensions.get('window').width / 3,
+    height: Dimensions.get('window').width / 3,
+    backgroundColor: '#555',
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    borderWidth: 1,
+    borderColor: '#fff',
   },
 
-  line: {
+  inlineItems: {
+    flexDirection: 'row'
+  },
+
+  boxPlayer: {
+    width: 80,
+    height: 80,
     backgroundColor: '#000',
-    height: 306,
-    width: 3,
-    position: 'absolute',
-    transform: [
-      { translateX: 100 }
-    ],
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: 3,
+  },
+
+  playerX: {
+    fontSize: 40,
+    color: '#553fda',
+  },
+
+  player0: {
+    fontSize: 40,
+    color: '#da3f3f'
   },
 });
-
-/* import React from 'react';
-import { View, StyleSheet, SafeAreaView, TextInput } from 'react-native';
-import Circle from '../../components/circle';
-import Cross from '../../components/cross';
-
-export default function game() {
-  return (
-    <View style={styles.container}>
-      <SafeAreaView style={styles.board}>
-        <View 
-          style={styles.line} />
-        <View
-          style={[styles.line, {
-            transform: [
-              { translateX: 200 }
-            ]
-          }]}/>
-
-        <View
-          style={[styles.line, {
-            height: 3,
-            width: 306,
-            transform: [
-              { translateY: 200 }
-            ]
-          }]}/>
-
-        <View
-          style={[styles.line, {
-            height: 3,
-            width: 306,
-            transform: [
-              { translateY: 100 }
-            ]
-          }]}/>
-        <Circle />
-        <Cross />
-      </SafeAreaView>
-    </View>
-  );
-}
-
-const styles = StyleSheet.create ({
-  container: {
-    display: 'flex',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F4E3D4',
-  }, 
-
-  board: {
-    borderWidth: 3,
-    borderColor: '#3A3A3C',
-    height: 312,
-    width: 312,
-  },
-
-  line: {
-    backgroundColor: '#000',
-    height: 306,
-    width: 3,
-    position: 'absolute',
-    transform: [
-      { translateX: 100 }
-    ],
-  },
-}); */
